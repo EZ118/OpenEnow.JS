@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>OpenEnow</title>
+		<style>
+			.richtext{position:relative;font-size:30px;margin-bottom:10px;margin-left:10px;}
+			.group{position:relative;}
+			.body{margin:0px;}
+			#enow-show{transform:scale(0.5,0.5);transform-origin: 0% 0%;}
+			
+		</style>
+	</head>
+	<body>
+		<center style="border-radius:10px;width:640px;height:360px;overflow:hidden;border:2px solid #65ad57;">
+			<div id="enow-show" align=left></div>
+		</center>
+		
+		<table width="640px">
+			<tr>
+				<td align="left"><a id="left-hand" href="javascript:void(0);">< BACK</a></td>
+				<td align="right"><a id="right-hand" href="javascript:void(0);">NEXT ></a></a></td>
+			</tr>
+		</table>
+		
+		
+		<script src="./openEnow.js"></script>
+		<script>
+			var en = new ENOW();
+			en.CONFIG({
+				"slides":"./courseware/Slides/",
+				"resources":"./courseware/Resources/",
+				"name":"综合练习5",
+				"container":"enow-show"
+			});
+			var pg = 0;
+			en.Xml2Html(en.GetSlideSource("Slide_" + pg + ".xml"));
+			
+			var l = document.getElementById("left-hand");
+			var r = document.getElementById("right-hand");
+			
+			l.onclick = function() {
+				if(pg > 0) {
+					pg -= 1;
+					en.Xml2Html(en.GetSlideSource("Slide_" + pg + ".xml"));
+				}
+				else{return;}
+			}
+			r.onclick = function() {
+				pg += 1;
+				en.Xml2Html(en.GetSlideSource("Slide_" + pg + ".xml"));
+			}
+		</script>
+		
+		
+		
+		<!--配置说明-->
+		<br><br><br>
+		<b>如何配置？</b><br>
+		首先用unzip.py或解压工具，将enbx文件中的resources、slides目录复制到指定路径<br>
+		再更改index.html中的en.CONFIG函数传递的配置信息，通过字典传递，其中slides、resources表示两目录的相对路径
+		<br><br>
+		<b>如何使用？</b><br>
+		该项目需要静态服务器（XMLHttpRequest）
+	</body>
+</html>
