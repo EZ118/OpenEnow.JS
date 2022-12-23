@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta charset='utf-8' />
+		<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
 		<title>OpenEnow</title>
 		<style>
-			.richtext{position:relative;font-size:30px;margin-bottom:10px;margin-left:10px;}
+			.richtext{
+				position:relative;
+				font-size:30px;
+				margin-bottom:10px;
+				margin-left:10px;
+				color: #000;
+				-webkit-text-stroke: 1px #FFF;
+				z-index:5;font-weight:bold;
+			}
 			.group{position:relative;}
 			.body{margin:0px;}
 			#enow-show{transform:scale(0.5,0.5);transform-origin: 0% 0%;}
-			
+			img{z-index:1;}
 		</style>
 	</head>
 	<body>

@@ -65,6 +65,7 @@ class ENOW {
 		this.slidesPath = "./Slides/";
 		this.resPath = "./Resources/";
 		this.name = "Enbx Courseware";
+		this.body = document.getElementsByTagName("body")[0];
 	}
 	
 	CONFIG(json) {
@@ -86,7 +87,8 @@ class ENOW {
 		return xmlhttp.responseXML;
 	}
 	
-	/*GetXYWH(txt) {
+	/*
+	GetXYWH(txt) {
 		try{
 			let gx = txt.getElementsByTagName("X"); gx = gx[gx.length - 1].innerHTML;
 			let gy = txt.getElementsByTagName("Y"); gy = gy[gy.length - 1].innerHTML;
@@ -97,59 +99,100 @@ class ENOW {
 			return [0, 0, "auto", "auto"];
 		}
 	}
-	
-	Xml2Html(xml) {
-		let g = xml.getElementsByTagName("Group");
-		
-		var gt = "";
-		for (let i = 0; i < g.length; i ++){
-			let gp = this.GetXYWH(g[i]);
-			
-			let e = g[i].getElementsByTagName("RichText");
-			var et = "";
-			for(let j = 0; j < e.length; j ++) {
-				
-				let tp = this.GetXYWH(e[j]);
-				let txt = e[j].getElementsByTagName("Text");
-				txt = txt[txt.length - 1].innerHTML;
-				
-				et += "<div class='richtext' style='top:" + tp[1] + ";\
-					  left:" + tp[0] + ";width:" + tp[1] + ";height:" + tp[2] + ";'>" + txt + "</div>";
-			}
-			et = "<div class='group' style='top:" + gp[1] + ";\
-				 left:" + gp[0] + ";width:" + gp[1] + ";height:" + gp[2] + ";'>" + et + "</div>";
-			gt += et;
-		}
-		return gt;
-	}*/
+	*/
 	
 	Xml2Html(xml){
 		let json = xml2json(xml); /*调用函数，xml转json*/
+		console.log(json);
+		let res = "";
 		
 		/*幻灯片大小*/
 		let ele = document.getElementById(this.body);
-		ele.setAttribute("style", ele.getAttribute("style") + ";width:" + json["Slide"]["Width"] + "px;height:" + json["Slide"]["Height"] + "px;background-size:100% 100%;");
+		ele.setAttribute("style", "width:" + json["Slide"]["Width"] + "px;height:" + json["Slide"]["Height"] + "px;background-size:100% 100%;");
+		self.width = json["Slide"]["Width"];
+		self.height = json["Slide"]["Height"];
 		
 		/*背景颜色或图片*/
-		let res = "";
+		
 		try{ res = "<style>#" + this.body + "{background:url(" + json["Slide"]["Background"]["ImageBrush"]["Source"].replace("id://", this.resPath) + ");}</style>";}
 		catch(e) { res = "<style>#" + this.body + "{background:" + json["Slide"]["Background"]["ColorBrush"] + ";}</style>"; }
 		
 		/*显示Text*/
 		try{
 			for(let i = 0; i < json["Slide"]["Elements"]["Text"].length; i ++){
-				res += "<div class='richtext'>" + json["Slide"]["Elements"]["Text"][i]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>') + "</div><br/>";
+				let txtc = json["Slide"]["Elements"]["Text"][i]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>');
+				let txtx = json["Slide"]["Elements"]["Text"][i]["X"];
+				let txty = json["Slide"]["Elements"]["Text"][i]["Y"];
+				res += `<div class='richtext' align='left' style='
+					position:absolute;top:` + txty + `px;left:` + txtx + `px;'>
+					` + txtc + `</div><br/>`;
 			}
 		} catch(e){}
 		try{
-			for(let i = 0; i < json["Slide"]["Group"].length; i ++){
-				for(let j = 0; j < json["Slide"]["Group"][i]["Elements"]["Text"].length; j ++){
-					
-					res += "<div class='richtext' align='left'>" + json["Slide"]["Group"][i]["Elements"]["Text"][j]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>') + "</div><br/>";
+			for(let i = 0; i < json["Slide"]["Elements"]["Group"].length; i ++){
+				for(let j = 0; j < json["Slide"]["Elements"]["Group"][i]["Elements"]["Text"].length; j ++){
+					let txtc = json["Slide"]["Elements"]["Group"][i]["Elements"]["Text"][j]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>');
+					let txtx = json["Slide"]["Elements"]["Group"][i]["Elements"]["Text"][j]["X"];
+					let txty = json["Slide"]["Elements"]["Group"][i]["Elements"]["Text"][j]["Y"];
+					res += `<div class='richtext' align='left' style='
+						position:absolute;top:` + txty + `;left:` + txtx + `;'>
+						` + txtc + `</div><br/>`;
 				}
 			}
 		} catch(e){}
 		
+		/*显示Picture*/
+		try{
+			let imgurl = json["Slide"]["Elements"]["Picture"]["Source"].replace("id://", this.resPath);
+			let imgformat = json["Slide"]["Elements"]["Picture"]["PictureName"].split(".");
+			let imgw = json["Slide"]["Elements"]["Picture"]["Width"];
+			let imgh = json["Slide"]["Elements"]["Picture"]["Height"];
+			let imgx = json["Slide"]["Elements"]["Picture"]["X"];
+			let imgy = json["Slide"]["Elements"]["Picture"]["Y"];
+			
+			imgurl += "." + imgformat[imgformat.length - 1];
+			
+			res += `<img src='` + imgurl + `' width='` + imgw + `' height='` + imgh + `' 
+					style='position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
+		} catch(e){}
+		try{
+			for(let i = 0; i < json["Slide"]["Elements"]["Picture"].length; i ++){
+				try{
+					let imgurl = json["Slide"]["Elements"]["Picture"][i]["Source"].replace("id://", this.resPath);
+					let imgformat = json["Slide"]["Elements"]["Picture"][i]["PictureName"].split(".");
+					let imgw = json["Slide"]["Elements"]["Picture"][i]["Width"];
+					let imgh = json["Slide"]["Elements"]["Picture"][i]["Height"];
+					let imgx = json["Slide"]["Elements"]["Picture"][i]["X"];
+					let imgy = json["Slide"]["Elements"]["Picture"][i]["Y"];
+					
+					imgurl += "." + imgformat[imgformat.length - 1];
+					
+					res += `<img src='` + imgurl + `' width='` + imgw + `' height='` + imgh + `' 
+							style='position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
+					/*console.log(res);*/
+				} catch(e){}
+			}
+		} catch(e){}
+		try{
+			for(let j = 0; j < json["Slide"]["Elements"]["Group"].length; j ++){
+				for(let i = 0; i < json["Slide"]["Elements"]["Group"][i]["Elements"]["Picture"].length; i ++){
+					try{
+						let imgurl = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["Source"].replace("id://", this.resPath);
+						let imgformat = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["PictureName"].split(".");
+						let imgw = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["Width"];
+						let imgh = json["Slide"]["Elements"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["Height"];
+						let imgx = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["X"];
+						let imgy = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["Y"];
+						
+						imgurl += "." + imgformat[imgformat.length - 1];
+						
+						res += `<img src='` + imgurl + `' width='` + imgw + `' height='` + imgh + `' 
+								style='position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
+						/*console.log(res);*/
+					} catch(e){}
+				}
+			}
+		} catch(e){}
 		
 		document.getElementById(this.body).innerHTML = res;
 		return res;
