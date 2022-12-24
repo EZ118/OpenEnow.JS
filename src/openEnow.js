@@ -103,7 +103,7 @@ class ENOW {
 	
 	Xml2Html(xml){
 		let json = xml2json(xml); /*调用函数，xml转json*/
-		console.log(json);
+		//console.log(json);
 		let res = "";
 		
 		/*幻灯片大小*/
@@ -117,80 +117,150 @@ class ENOW {
 		try{ res = "<style>#" + this.body + "{background:url(" + json["Slide"]["Background"]["ImageBrush"]["Source"].replace("id://", this.resPath) + ");}</style>";}
 		catch(e) { res = "<style>#" + this.body + "{background:" + json["Slide"]["Background"]["ColorBrush"] + ";}</style>"; }
 		
+		let JsonMain = json["Slide"]["Elements"];
 		/*显示Text*/
 		try{
-			for(let i = 0; i < json["Slide"]["Elements"]["Text"].length; i ++){
-				let txtc = json["Slide"]["Elements"]["Text"][i]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>');
-				let txtx = json["Slide"]["Elements"]["Text"][i]["X"];
-				let txty = json["Slide"]["Elements"]["Text"][i]["Y"];
-				res += `<div class='richtext' align='left' style='
-					position:absolute;top:` + txty + `px;left:` + txtx + `px;'>
-					` + txtc + `</div><br/>`;
+			let txtc = JsonMain["Text"]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>');
+			let txtx = JsonMain["Text"]["X"];
+			let txty = JsonMain["Text"]["Y"];
+			res += `<div class='richtext' align='left' style='position:absolute;top:` + txty + `px;left:` + txtx + `px;'>` + txtc + `</div><br/>`;
+		} catch(e){}
+		try{
+			for(let i = 0; i < JsonMain["Text"].length; i ++){
+				let txtc = JsonMain["Text"][i]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>');
+				let txtx = JsonMain["Text"][i]["X"];
+				let txty = JsonMain["Text"][i]["Y"];
+				res += `<div class='richtext' align='left' style='position:absolute;top:` + txty + `px;left:` + txtx + `px;'>` + txtc + `</div><br/>`;
 			}
 		} catch(e){}
 		try{
-			for(let i = 0; i < json["Slide"]["Elements"]["Group"].length; i ++){
-				for(let j = 0; j < json["Slide"]["Elements"]["Group"][i]["Elements"]["Text"].length; j ++){
-					let txtc = json["Slide"]["Elements"]["Group"][i]["Elements"]["Text"][j]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>');
-					let txtx = json["Slide"]["Elements"]["Group"][i]["Elements"]["Text"][j]["X"];
-					let txty = json["Slide"]["Elements"]["Group"][i]["Elements"]["Text"][j]["Y"];
-					res += `<div class='richtext' align='left' style='
-						position:absolute;top:` + txty + `;left:` + txtx + `;'>
-						` + txtc + `</div><br/>`;
+			for(let i = 0; i < JsonMain["Group"].length; i ++){
+				for(let j = 0; j < JsonMain["Group"][i]["Elements"]["Text"].length; j ++){
+					let txtc = JsonMain["Group"][i]["Elements"]["Text"][j]["RichText"]["Text"].replace(/\r\n|\n|\r/g, '<br/>');
+					let txtx = JsonMain["Group"][i]["Elements"]["Text"][j]["X"];
+					let txty = JsonMain["Group"][i]["Elements"]["Text"][j]["Y"];
+					res += `<div class='richtext' align='left' style='position:absolute;top:` + txty + `px;left:` + txtx + `px;'>` + txtc + `</div><br/>`;
 				}
 			}
 		} catch(e){}
 		
 		/*显示Picture*/
 		try{
-			let imgurl = json["Slide"]["Elements"]["Picture"]["Source"].replace("id://", this.resPath);
-			let imgformat = json["Slide"]["Elements"]["Picture"]["PictureName"].split(".");
-			let imgw = json["Slide"]["Elements"]["Picture"]["Width"];
-			let imgh = json["Slide"]["Elements"]["Picture"]["Height"];
-			let imgx = json["Slide"]["Elements"]["Picture"]["X"];
-			let imgy = json["Slide"]["Elements"]["Picture"]["Y"];
+			let imgurl = JsonMain["Picture"]["Source"].replace("id://", this.resPath);
+			let imgformat = JsonMain["Picture"]["PictureName"].split(".");
+			let imgw = JsonMain["Picture"]["Width"];
+			let imgh = JsonMain["Picture"]["Height"];
+			let imgx = JsonMain["Picture"]["X"];
+			let imgy = JsonMain["Picture"]["Y"];
 			
 			imgurl += "." + imgformat[imgformat.length - 1];
 			
-			res += `<img src='` + imgurl + `' width='` + imgw + `' height='` + imgh + `' 
-					style='position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
+			res += `<img src='` + imgurl + `' style='width:` + imgw + `px;height:` + imgh + `px;position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
 		} catch(e){}
 		try{
-			for(let i = 0; i < json["Slide"]["Elements"]["Picture"].length; i ++){
+			for(let i = 0; i < JsonMain["Picture"].length; i ++){
 				try{
-					let imgurl = json["Slide"]["Elements"]["Picture"][i]["Source"].replace("id://", this.resPath);
-					let imgformat = json["Slide"]["Elements"]["Picture"][i]["PictureName"].split(".");
-					let imgw = json["Slide"]["Elements"]["Picture"][i]["Width"];
-					let imgh = json["Slide"]["Elements"]["Picture"][i]["Height"];
-					let imgx = json["Slide"]["Elements"]["Picture"][i]["X"];
-					let imgy = json["Slide"]["Elements"]["Picture"][i]["Y"];
+					let imgurl = JsonMain["Picture"][i]["Source"].replace("id://", this.resPath);
+					let imgformat = JsonMain["Picture"][i]["PictureName"].split(".");
+					let imgw = JsonMain["Picture"][i]["Width"];
+					let imgh = JsonMain["Picture"][i]["Height"];
+					let imgx = JsonMain["Picture"][i]["X"];
+					let imgy = JsonMain["Picture"][i]["Y"];
 					
 					imgurl += "." + imgformat[imgformat.length - 1];
 					
-					res += `<img src='` + imgurl + `' width='` + imgw + `' height='` + imgh + `' 
-							style='position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
-					/*console.log(res);*/
+					res += `<img src='` + imgurl + `' style='width:` + imgw + `px;height:` + imgh + `px;position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
 				} catch(e){}
 			}
 		} catch(e){}
 		try{
-			for(let j = 0; j < json["Slide"]["Elements"]["Group"].length; j ++){
-				for(let i = 0; i < json["Slide"]["Elements"]["Group"][i]["Elements"]["Picture"].length; i ++){
+			for(let j = 0; j < JsonMain["Group"].length; j ++){
+				for(let i = 0; i < JsonMain["Group"][i]["Elements"]["Picture"].length; i ++){
 					try{
-						let imgurl = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["Source"].replace("id://", this.resPath);
-						let imgformat = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["PictureName"].split(".");
-						let imgw = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["Width"];
-						let imgh = json["Slide"]["Elements"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["Height"];
-						let imgx = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["X"];
-						let imgy = json["Slide"]["Elements"]["Group"][j]["Elements"]["Picture"][i]["Y"];
+						let imgurl = JsonMain["Group"][j]["Elements"]["Picture"][i]["Source"].replace("id://", this.resPath);
+						let imgformat = JsonMain["Group"][j]["Elements"]["Picture"][i]["PictureName"].split(".");
+						let imgw = JsonMain["Group"][j]["Elements"]["Picture"][i]["Width"];
+						let imgh = JsonMain["Group"][j]["Elements"]["Picture"][i]["Height"];
+						let imgx = JsonMain["Group"][j]["Elements"]["Picture"][i]["X"];
+						let imgy = JsonMain["Group"][j]["Elements"]["Picture"][i]["Y"];
 						
 						imgurl += "." + imgformat[imgformat.length - 1];
 						
-						res += `<img src='` + imgurl + `' width='` + imgw + `' height='` + imgh + `' 
-								style='position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
-						/*console.log(res);*/
+						res += `<img src='` + imgurl + `' style='width:` + imgw + `px;height:` + imgh + `px;position:absolute;top:` + imgy + `px;left:` + imgx + `px;'>`;
 					} catch(e){}
 				}
+			}
+		} catch(e){}
+		
+		/*显示Audio*/
+		try{
+			let audiourl = JsonMain["Audio"]["Source"].replace("id://", this.resPath);
+			let audioformat = JsonMain["Audio"]["MediaName"].split(".");
+			let audiow = JsonMain["Audio"]["Width"];
+			let audioh = JsonMain["Audio"]["Height"];
+			let audiox = JsonMain["Audio"]["X"];
+			let audioy = JsonMain["Audio"]["Y"];
+			
+			audiourl += "." + audioformat[audioformat.length - 1];
+			
+			res += `<audio controls style='position:absolute;top:` + audioy + `px;left:` + audiox + `px;width:` + audiow + `px;height:` + audioh + `px;'>
+					<source src="` + audiourl + `" type="audio/mpeg">
+					Unsupported Function
+				</audio>`;
+		} catch(e){}
+		try{
+			for(let i = 0; i < JsonMain["Audio"].length; i ++){
+				try{
+					let audiourl = JsonMain["Audio"][i]["Source"].replace("id://", this.resPath);
+					let audioformat = JsonMain["Audio"][i]["MediaName"].split(".");
+					let audiow = JsonMain["Audio"][i]["Width"];
+					let audioh = JsonMain["Audio"][i]["Height"];
+					let audiox = JsonMain["Audio"][i]["X"];
+					let audioy = JsonMain["Audio"][i]["Y"];
+					
+					audiourl += "." + audioformat[audioformat.length - 1];
+					
+					res += `<audio controls style='position:absolute;top:` + audioy + `px;left:` + audiox + `px;width:` + audiow + `px;height:` + audioh + `px;'>
+							<source src="` + audiourl + `" type="audio/mpeg">
+							Unsupported Function
+						</audio>`;
+				} catch(e){}
+			}
+		} catch(e){}
+		
+		/*显示Video*/
+		try{
+			let videourl = JsonMain["Video"]["Source"].replace("id://", this.resPath);
+			let videoformat = JsonMain["Video"]["MediaName"].split(".");
+			let videow = JsonMain["Video"]["Width"];
+			let videoh = JsonMain["Video"]["Height"];
+			let videox = JsonMain["Video"]["X"];
+			let videoy = JsonMain["Video"]["Y"];
+			
+			videourl += "." + videoformat[videoformat.length - 1];
+			
+			res += `<video controls style='position:absolute;top:` + videoy + `px;left:` + videox + `px;width:` + videow + `px;height:` + videoh + `px;'>
+					<source src="` + videourl + `">
+					Unsupported Function
+				</video>`;
+		} catch(e){}
+		try{
+			for(let i = 0; i < JsonMain["Video"].length; i ++){
+				try{
+					let videourl = JsonMain["Video"][i]["Source"].replace("id://", this.resPath);
+					let videoformat = JsonMain["Video"][i]["MediaName"].split(".");
+					let videow = JsonMain["Video"][i]["Width"];
+					let videoh = JsonMain["Video"][i]["Height"];
+					let videox = JsonMain["Video"][i]["X"];
+					let videoy = JsonMain["Video"][i]["Y"];
+					
+					videourl += "." + videoformat[videoformat.length - 1];
+					
+					res += `<video controls style='position:absolute;top:` + videoy + `px;left:` + videox + `px;width:` + videow + `px;height:` + videoh + `px;'>
+							<source src="` + videourl + `">
+							Unsupported Function
+						</video>`;
+				} catch(e){}
 			}
 		} catch(e){}
 		
