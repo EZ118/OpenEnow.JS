@@ -24,7 +24,14 @@ en.CONFIG({
 ```   
 ### 展示课件指定幻灯片   
 ```javascript
-en.Xml2Html(en.GetSlideSource("Slide_0.xml")); 
+en.display(1);
+/*
+ 语法：display(page, mode)
+ page 页码（从1开始）【必填】
+ mode 同步或异步 【选填，默认false（同步）】
+*/
+
+//en.Xml2Html(en.GetSlideSource("Slide_0.xml")); 
 /*
  en.GetSlideSource("Slide_0.xml") 获取xml内容
  en.Xml2Html() 由xml内容转为浏览器可显示的html代码
