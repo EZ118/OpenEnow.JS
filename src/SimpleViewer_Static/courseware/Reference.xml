@@ -1,0 +1,24 @@
+﻿<Reference>
+  <Relationships>
+    <Relationship>
+      <Id>2afb8b665cc79a77e560d69812d08f4d</Id>
+      <Target>Resources\2afb8b665cc79a77e560d69812d08f4d</Target>
+      <Hash>2afb8b665cc79a77e560d69812d08f4d</Hash>
+    </Relationship>
+    <Relationship>
+      <Id>7105ede5aba6e3147a32a04d467b2a09</Id>
+      <Target>Resources\7105ede5aba6e3147a32a04d467b2a09</Target>
+      <Hash>7105ede5aba6e3147a32a04d467b2a09</Hash>
+    </Relationship>
+    <Relationship>
+      <Id>944acab37cce4d78a5a7871f9e1d1460</Id>
+      <Target>Resources\944acab37cce4d78a5a7871f9e1d1460.png</Target>
+      <Hash>944acab37cce4d78a5a7871f9e1d1460</Hash>
+    </Relationship>
+    <Relationship>
+      <Id>da565eefed6bc26f88db6cd36618591f</Id>
+      <Target>Resources\da565eefed6bc26f88db6cd36618591f.mp3</Target>
+      <Hash>da565eefed6bc26f88db6cd36618591f</Hash>
+    </Relationship>
+  </Relationships>
+</Reference>
