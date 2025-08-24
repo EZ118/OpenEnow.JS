@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='UTF-8' />
+		<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+		<title>OpenEnow.JS</title>
+		<link rel='stylesheet' href='./openenow.css'/>
+		<script src="./jszip.min.js"></script>
+		<script src="./openenow.js"></script>
+		<script src="./main.js"></script>
+	</head>
+	<body>
+		<h1>OpenEnow.JS</h1><hr>
+
+		<h3>1. Select file from local. (.enbx)</h3>
+		<input type="file" id="fileInput" accept=".enbx,.zip"/>
+
+		<h3>2. View content below.</h3>
+		<center style="border-radius:10px;width:640px;height:360px;overflow:hidden;border:2px solid #65ad57;">
+			<div id="enow-show" align=left></div>
+		</center>
+		
+		<table width="640px">
+			<tr>
+				<td align="left"><a id="left-hand" href="javascript:void(0);">< BACK</a></td>
+				<td align="right"><a id="right-hand" href="javascript:void(0);">NEXT ></a></a></td>
+			</tr>
+		</table>
+	</body>
+</html>
