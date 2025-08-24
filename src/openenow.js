@@ -315,6 +315,8 @@ class ENOW {
 		let fontSize = 16;
 		let fontFamily = "Arial";
 		let color = "#000000";
+		let fontWeight = "normal";
+		let fontStyle = "normal";
 		
 		if (richText && richText.TextLines && richText.TextLines.TextLine) {
 			const textLine = Array.isArray(richText.TextLines.TextLine) 
@@ -326,17 +328,39 @@ class ENOW {
 					? textLine.TextRuns.TextRun[0] 
 					: textLine.TextRuns.TextRun;
 				
+				// 字体大小
 				if (textRun.FontSize) {
 					fontSize = parseFloat(textRun.FontSize);
 				}
+				
+				// 字体族
 				if (textRun.FontFamily && textRun.FontFamily.Source) {
 					fontFamily = textRun.FontFamily.Source;
 				}
+				
+				// 颜色处理 - 支持多种格式
 				if (textRun.Foreground && textRun.Foreground.ColorBrush) {
-					color = textRun.Foreground.ColorBrush;
+					const colorValue = textRun.Foreground.ColorBrush;
+					color = this._parseColor(colorValue);
+				}
+				
+				// 字体粗细
+				if (textRun.FontWeight) {
+					fontWeight = textRun.FontWeight.toLowerCase();
+					if (fontWeight === 'bold') fontWeight = 'bold';
+					else fontWeight = 'normal';
+				}
+				
+				// 字体样式
+				if (textRun.FontStyle) {
+					fontStyle = textRun.FontStyle.toLowerCase();
+					if (fontStyle === 'italic') fontStyle = 'italic';
+					else fontStyle = 'normal';
 				}
 			}
 		}
+
+		console.log(`[ENOW] Text style: color=${color}, fontSize=${fontSize}, fontFamily=${fontFamily}`);
 
 		const textDiv = document.createElement('div');
 		textDiv.style.position = 'absolute';
@@ -345,10 +369,13 @@ class ENOW {
 		textDiv.style.width = w + 'px';
 		textDiv.style.height = h + 'px';
 		textDiv.style.fontSize = fontSize + 'px';
-		textDiv.style.fontFamily = fontFamily;
+		textDiv.style.fontFamily = `"${fontFamily}", Arial, sans-serif`;
 		textDiv.style.color = color;
+		textDiv.style.fontWeight = fontWeight;
+		textDiv.style.fontStyle = fontStyle;
 		textDiv.style.overflow = 'hidden';
-		textDiv.style.border = '1px dashed rgba(255,0,0,0.3)'; // 调试边框
+		textDiv.style.lineHeight = '1.2';
+		// textDiv.style.border = '1px dashed rgba(255,0,0,0.3)'; // 调试边框 - 可以注释掉
 		textDiv.innerHTML = textContent;
 		
 		container.appendChild(textDiv);
@@ -467,6 +494,70 @@ class ENOW {
 		}
 		
 		container.appendChild(videoElement);
+	}
+
+	/**
+	 * 解析颜色值，支持多种格式
+	 * @param {string} colorValue - 颜色值（如 #FFFFFFFF, #FFFFFF, rgba等）
+	 * @returns {string} - 标准的CSS颜色值
+	 */
+	_parseColor(colorValue) {
+		if (!colorValue) return "#000000";
+		
+		// 移除空格
+		colorValue = colorValue.trim();
+		
+		// 如果是8位十六进制颜色 (ARGB格式: #AARRGGBB)
+		if (colorValue.match(/^#[0-9A-Fa-f]{8}$/)) {
+			// 提取 ARGB
+			const a = parseInt(colorValue.substr(1, 2), 16) / 255; // Alpha
+			const r = parseInt(colorValue.substr(3, 2), 16);       // Red
+			const g = parseInt(colorValue.substr(5, 2), 16);       // Green  
+			const b = parseInt(colorValue.substr(7, 2), 16);       // Blue
+			
+			// 如果alpha是1，返回标准hex格式，否则返回rgba
+			if (a === 1) {
+				return `#${colorValue.substr(3, 6)}`;
+			} else {
+				return `rgba(${r}, ${g}, ${b}, ${a.toFixed(2)})`;
+			}
+		}
+		
+		// 如果是6位十六进制颜色
+		if (colorValue.match(/^#[0-9A-Fa-f]{6}$/)) {
+			return colorValue;
+		}
+		
+		// 如果是3位十六进制颜色
+		if (colorValue.match(/^#[0-9A-Fa-f]{3}$/)) {
+			return colorValue;
+		}
+		
+		// 如果已经是rgba或rgb格式
+		if (colorValue.startsWith('rgb')) {
+			return colorValue;
+		}
+		
+		// 预定义颜色名称映射
+		const colorNames = {
+			'white': '#FFFFFF',
+			'black': '#000000',
+			'red': '#FF0000',
+			'green': '#008000',
+			'blue': '#0000FF',
+			'yellow': '#FFFF00',
+			'cyan': '#00FFFF',
+			'magenta': '#FF00FF'
+		};
+		
+		const lowerColor = colorValue.toLowerCase();
+		if (colorNames[lowerColor]) {
+			return colorNames[lowerColor];
+		}
+		
+		// 默认返回黑色
+		console.warn(`[ENOW] Unknown color format: ${colorValue}, using black`);
+		return "#000000";
 	}
 
 	_ensureArray(value) {
