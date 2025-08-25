@@ -1,25 +1,122 @@
-.richtext {
-	position: relative;
-	font-size: 30px;
-
-	/*mix-blend-mode: difference;*/
-	filter: invert(100%);
-	z-index: 5;
-}
-
-.group {
-	position: relative;
-}
-
-.body {
+html,
+body {
 	margin: 0px;
+	padding: 0px;
+	width: 100vw;
+	height: 100vh;
+	-webkit-appearance: none !important;
+	overflow: hidden;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#enow-show {
-	transform: scale(0.5, 0.5);
-	transform-origin: 0% 0%;
+* {
+	box-sizing: border-box;
 }
 
-img {
+header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	height: 50px;
+	padding: 5px;
+	margin: 0;
+	background-color: #65ad57;
+	color: #FFFFFF;
+	user-select: none;
+	z-index: 10;
+}
+
+header .title {
+	font-size: 24px;
+	font-weight: lighter;
+	margin: 0px;
+	padding: 0px;
+	cursor: pointer;
+}
+
+header .blank {
+	flex: 1;
+}
+
+header .funcBtn {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 24px;
+	width: 50px;
+	height: 50px;
+	cursor: pointer;
+	margin: 0;
+	transition: all 0.1s;
+	background: inherit;
+}
+
+header .funcBtn:hover {
+	filter: brightness(0.9);
+}
+
+header .funcBtn:active {
+	filter: brightness(0.8);
+}
+
+header #fileInput {
+	display: none;
+}
+
+main {
+	width: 100vw;
+	height: calc(100vh - 50px);
+	overflow: hidden;
+	background: rgb(50, 54, 57);
 	z-index: 1;
+}
+
+main #enow-show {
+	transform-origin: 0% 0%;
+	transition: all 0.2s;
+	width: 1280px;
+	height: 720px;
+	position: relative;
+	background: #f0f0f0;
+	overflow: hidden;
+}
+
+main #enow-show img {
+	z-index: 2;
+}
+
+.pageControl {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+
+	width: fit-content;
+	text-align: center;
+	user-select: none;
+	border-radius: 5px;
+	overflow: hidden;
+	height: 50px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.pageControl button {
+	background-color: rgba(240, 240, 240, 0.8);
+	border: none;
+	color: #FFFFFF;
+	font-size: 24px;
+	width: 50px;
+	height: 50px;
+	cursor: pointer;
+	margin: 0;
+	transition: all 0.1s;
+}
+
+.pageControl button:hover,
+.pageControl button:active {
+	color: #65ad57;
+	filter: brightness(0.9);
 }

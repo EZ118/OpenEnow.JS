@@ -45,3 +45,9 @@ await enow.display(0);
 - Slide_0.xml表示第一张幻灯片；Slide_1.xml表示第二张幻灯片；以此类推......
 - 展示幻灯片函数可以在网页加载完成后反复调用
 - 幻灯片浏览完毕后建议清理本地缓存资源
+- 使用该库是必须先引入`jszip.js`
+- demo代码中包含zepto，但这不是OpenEnow.JS的依赖
+
+## 参考与使用
+- [jszip](https://github.com/Stuk/jszip)
+- [zepto](https://github.com/madrobby/zepto/)
