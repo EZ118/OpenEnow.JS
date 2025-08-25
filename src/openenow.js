@@ -1,6 +1,5 @@
 /**
  * ENOW.js - A modern library to render .enbx courseware directly from a JSZip object.
- * FIXED VERSION: Corrected resource loading and positioning.
  */
 
 /**
@@ -116,7 +115,7 @@ class ENOW {
 	 */
 	async _getResourceUrl(resourceId, extension) {
 		const cacheKey = `${resourceId}.${extension}`;
-		
+
 		// 检查缓存
 		if (this.resourceCache.has(cacheKey)) {
 			return this.resourceCache.get(cacheKey);
@@ -233,7 +232,7 @@ class ENOW {
 		// 设置幻灯片大小
 		const width = parseInt(slide.Width || 1280, 10);
 		const height = parseInt(slide.Height || 720, 10);
-		
+
 		container.style.width = width + "px";
 		container.style.height = height + "px";
 		container.style.position = "relative";
@@ -247,7 +246,7 @@ class ENOW {
 		if (slide.Background && slide.Background.ImageBrush && slide.Background.ImageBrush.Source) {
 			const bgResourceId = slide.Background.ImageBrush.Source.replace("id://", "");
 			console.log(`[ENOW] Loading background: ${bgResourceId}`);
-			
+
 			// 尝试常见的图片格式
 			const bgFormats = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
 			for (const format of bgFormats) {
@@ -299,58 +298,58 @@ class ENOW {
 	async _renderTextElement(txt, container) {
 		const richText = txt.RichText;
 		let textContent = "";
-		
+
 		if (richText && richText.Text) {
 			textContent = richText.Text.toString();
 		}
-		
+
 		textContent = textContent.replace(/\r\n|\n|\r/g, '<br/>');
-		
+
 		const x = parseFloat(txt.X || 0);
 		const y = parseFloat(txt.Y || 0);
 		const w = parseFloat(txt.Width || 100);
 		const h = parseFloat(txt.Height || 50);
-		
+
 		// 提取样式
 		let fontSize = 16;
 		let fontFamily = "Arial";
 		let color = "#000000";
 		let fontWeight = "normal";
 		let fontStyle = "normal";
-		
+
 		if (richText && richText.TextLines && richText.TextLines.TextLine) {
-			const textLine = Array.isArray(richText.TextLines.TextLine) 
-				? richText.TextLines.TextLine[0] 
+			const textLine = Array.isArray(richText.TextLines.TextLine)
+				? richText.TextLines.TextLine[0]
 				: richText.TextLines.TextLine;
-			
+
 			if (textLine.TextRuns && textLine.TextRuns.TextRun) {
-				const textRun = Array.isArray(textLine.TextRuns.TextRun) 
-					? textLine.TextRuns.TextRun[0] 
+				const textRun = Array.isArray(textLine.TextRuns.TextRun)
+					? textLine.TextRuns.TextRun[0]
 					: textLine.TextRuns.TextRun;
-				
+
 				// 字体大小
 				if (textRun.FontSize) {
 					fontSize = parseFloat(textRun.FontSize);
 				}
-				
+
 				// 字体族
 				if (textRun.FontFamily && textRun.FontFamily.Source) {
 					fontFamily = textRun.FontFamily.Source;
 				}
-				
+
 				// 颜色处理 - 支持多种格式
 				if (textRun.Foreground && textRun.Foreground.ColorBrush) {
 					const colorValue = textRun.Foreground.ColorBrush;
 					color = this._parseColor(colorValue);
 				}
-				
+
 				// 字体粗细
 				if (textRun.FontWeight) {
 					fontWeight = textRun.FontWeight.toLowerCase();
 					if (fontWeight === 'bold') fontWeight = 'bold';
 					else fontWeight = 'normal';
 				}
-				
+
 				// 字体样式
 				if (textRun.FontStyle) {
 					fontStyle = textRun.FontStyle.toLowerCase();
@@ -377,7 +376,7 @@ class ENOW {
 		textDiv.style.lineHeight = '1.2';
 		// textDiv.style.border = '1px dashed rgba(255,0,0,0.3)'; // 调试边框 - 可以注释掉
 		textDiv.innerHTML = textContent;
-		
+
 		container.appendChild(textDiv);
 	}
 
@@ -385,7 +384,7 @@ class ENOW {
 		const resourceId = img.Source ? img.Source.replace("id://", "") : null;
 		const pictureName = img.PictureName || "image.png";
 		const extension = pictureName.split('.').pop() || 'png';
-		
+
 		if (!resourceId) {
 			console.warn("Picture element missing source");
 			return;
@@ -399,7 +398,7 @@ class ENOW {
 		console.log(`[ENOW] Loading image: ${resourceId}.${extension} at (${x}, ${y}) size ${w}x${h}`);
 
 		const imgUrl = await this._getResourceUrl(resourceId, extension);
-		
+
 		if (imgUrl) {
 			const imgElement = document.createElement('img');
 			imgElement.src = imgUrl;
@@ -409,15 +408,15 @@ class ENOW {
 			imgElement.style.width = w + 'px';
 			imgElement.style.height = h + 'px';
 			imgElement.style.border = '1px dashed rgba(0,255,0,0.3)'; // 调试边框
-			
+
 			imgElement.onload = () => {
 				console.log(`[ENOW] Image loaded successfully: ${resourceId}`);
 			};
-			
+
 			imgElement.onerror = () => {
 				console.error(`[ENOW] Failed to load image: ${resourceId}`);
 			};
-			
+
 			container.appendChild(imgElement);
 		} else {
 			// 创建占位符
@@ -433,7 +432,7 @@ class ENOW {
 			placeholder.style.alignItems = 'center';
 			placeholder.style.justifyContent = 'center';
 			placeholder.innerHTML = `<span style="color: #666;">Image not found<br>${resourceId}</span>`;
-			
+
 			container.appendChild(placeholder);
 		}
 	}
@@ -442,7 +441,7 @@ class ENOW {
 		const resourceId = audio.Source ? audio.Source.replace("id://", "") : null;
 		const mediaName = audio.MediaName || "audio.mp3";
 		const extension = mediaName.split('.').pop() || 'mp3';
-		
+
 		if (!resourceId) return;
 
 		const x = parseFloat(audio.X || 0);
@@ -451,7 +450,7 @@ class ENOW {
 		const h = parseFloat(audio.Height || 30);
 
 		const audioUrl = await this._getResourceUrl(resourceId, extension);
-		
+
 		const audioElement = document.createElement('audio');
 		audioElement.controls = true;
 		audioElement.style.position = 'absolute';
@@ -459,11 +458,11 @@ class ENOW {
 		audioElement.style.top = y + 'px';
 		audioElement.style.width = w + 'px';
 		audioElement.style.height = h + 'px';
-		
+
 		if (audioUrl) {
 			audioElement.src = audioUrl;
 		}
-		
+
 		container.appendChild(audioElement);
 	}
 
@@ -471,7 +470,7 @@ class ENOW {
 		const resourceId = video.Source ? video.Source.replace("id://", "") : null;
 		const mediaName = video.MediaName || "video.mp4";
 		const extension = mediaName.split('.').pop() || 'mp4';
-		
+
 		if (!resourceId) return;
 
 		const x = parseFloat(video.X || 0);
@@ -480,7 +479,7 @@ class ENOW {
 		const h = parseFloat(video.Height || 240);
 
 		const videoUrl = await this._getResourceUrl(resourceId, extension);
-		
+
 		const videoElement = document.createElement('video');
 		videoElement.controls = true;
 		videoElement.style.position = 'absolute';
@@ -488,11 +487,11 @@ class ENOW {
 		videoElement.style.top = y + 'px';
 		videoElement.style.width = w + 'px';
 		videoElement.style.height = h + 'px';
-		
+
 		if (videoUrl) {
 			videoElement.src = videoUrl;
 		}
-		
+
 		container.appendChild(videoElement);
 	}
 
@@ -503,10 +502,10 @@ class ENOW {
 	 */
 	_parseColor(colorValue) {
 		if (!colorValue) return "#000000";
-		
+
 		// 移除空格
 		colorValue = colorValue.trim();
-		
+
 		// 如果是8位十六进制颜色 (ARGB格式: #AARRGGBB)
 		if (colorValue.match(/^#[0-9A-Fa-f]{8}$/)) {
 			// 提取 ARGB
@@ -514,7 +513,7 @@ class ENOW {
 			const r = parseInt(colorValue.substr(3, 2), 16);       // Red
 			const g = parseInt(colorValue.substr(5, 2), 16);       // Green  
 			const b = parseInt(colorValue.substr(7, 2), 16);       // Blue
-			
+
 			// 如果alpha是1，返回标准hex格式，否则返回rgba
 			if (a === 1) {
 				return `#${colorValue.substr(3, 6)}`;
@@ -522,22 +521,22 @@ class ENOW {
 				return `rgba(${r}, ${g}, ${b}, ${a.toFixed(2)})`;
 			}
 		}
-		
+
 		// 如果是6位十六进制颜色
 		if (colorValue.match(/^#[0-9A-Fa-f]{6}$/)) {
 			return colorValue;
 		}
-		
+
 		// 如果是3位十六进制颜色
 		if (colorValue.match(/^#[0-9A-Fa-f]{3}$/)) {
 			return colorValue;
 		}
-		
+
 		// 如果已经是rgba或rgb格式
 		if (colorValue.startsWith('rgb')) {
 			return colorValue;
 		}
-		
+
 		// 预定义颜色名称映射
 		const colorNames = {
 			'white': '#FFFFFF',
@@ -549,12 +548,12 @@ class ENOW {
 			'cyan': '#00FFFF',
 			'magenta': '#FF00FF'
 		};
-		
+
 		const lowerColor = colorValue.toLowerCase();
 		if (colorNames[lowerColor]) {
 			return colorNames[lowerColor];
 		}
-		
+
 		// 默认返回黑色
 		console.warn(`[ENOW] Unknown color format: ${colorValue}, using black`);
 		return "#000000";
